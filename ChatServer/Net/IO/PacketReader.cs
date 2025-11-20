@@ -15,17 +15,16 @@ namespace ChatServer.Net.IO
         public PacketReader(NetworkStream ns) : base(ns)
         {
             _ns = ns;
-        } 
-    
-        public string ReadMssage()
+        }
+
+        public string ReadMessage()
         {
             byte[] msgBuffer;
             var length = ReadInt32();
             msgBuffer = new byte[length];
             _ns.Read(msgBuffer, 0, length);
 
-            var msg = Encoding.ASCII.GetString(msgBuffer);
-            return msg;
+            return Encoding.ASCII.GetString(msgBuffer);
         }
     }
     

@@ -16,7 +16,8 @@ namespace ChatClient.MVVM.ViewModel
 
         public ObservableCollection<UserModel> Users { get; set; }
 
-        public ObservableCollection<string> Messages { get; set; }
+        public ObservableCollection<MessageModel> Messages { get; set; }
+
         public RelayCommand ConnectToServerCommand { get; set; }
         public RelayCommand SendMessageCommand { get; set; }
         public string Username { get; set; }
@@ -27,7 +28,7 @@ namespace ChatClient.MVVM.ViewModel
         public MainViewModel()
         {
             Users = new ObservableCollection<UserModel>();
-            Messages = new ObservableCollection<string>();
+            Messages = new ObservableCollection<MessageModel>();
             _server = new Server();
             _server.connectedEvent += UserConnected;
             _server.userDisconnectedEvent += RemoveUser;
@@ -40,8 +41,8 @@ namespace ChatClient.MVVM.ViewModel
         {
             var user = new UserModel
             {
-                UserName = _server.PacketReader.ReadMssage(),
-                UID = _server.PacketReader.ReadMssage(),
+                UserName = _server.PacketReader.ReadMessage(),
+                UID = _server.PacketReader.ReadMessage(),
             };
 
             if (!Users.Any(x => x.UID == user.UID))
@@ -52,13 +53,24 @@ namespace ChatClient.MVVM.ViewModel
 
         private void MessageReceived()
         {
-            var msg = _server.PacketReader.ReadMssage();
-            Application.Current.Dispatcher.Invoke(() => Messages.Add(msg));
+            var username = _server.PacketReader.ReadMessage();
+            var content = _server.PacketReader.ReadMessage();
+            var uid = _server.PacketReader.ReadMessage();
+
+            var message = new MessageModel
+            {
+                Username = username,
+                Content = content,
+                UID = uid,
+                Timestamp = DateTime.Now
+            };
+
+            Application.Current.Dispatcher.Invoke(() => Messages.Add(message));
         }
 
         private void RemoveUser()
         {
-            var uid = _server.PacketReader.ReadMssage();
+            var uid = _server.PacketReader.ReadMessage();
             var user = Users.Where(x => x.UID == uid).FirstOrDefault();
             Application.Current.Dispatcher.Invoke(() => Users.Remove(user));
         }

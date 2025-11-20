@@ -34,7 +34,13 @@
         </DockPanel>
 
         <StackPanel Grid.Column="1">
-            <ListView Height="380" ItemsSource="{Binding Messages}"/>
+            <ListView Height="380" ItemsSource="{Binding Messages}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
 
             <StackPanel Orientation="Horizontal">
                 <TextBox Height="55" Width="530" VerticalContentAlignment="Center" Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"/>

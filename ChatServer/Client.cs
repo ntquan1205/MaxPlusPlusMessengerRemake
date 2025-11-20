@@ -23,7 +23,7 @@ namespace ChatServer
             _packetReader = new PacketReader(ClientSocket.GetStream());
 
             var opcode = _packetReader.ReadByte();
-            Username = _packetReader.ReadMssage();
+            Username = _packetReader.ReadMessage();
 
 
             Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {Username}");
@@ -41,9 +41,10 @@ namespace ChatServer
                     switch (opcode)
                     {
                         case 5:
-                            var msg = _packetReader.ReadMssage();
-                            Console.WriteLine($"[{DateTime.Now}]: Message Received {msg}");
-                            Program.BroadcastMessage($"[{DateTime.Now}]:[{Username}]: {msg}");
+                            var receivedMessage = _packetReader.ReadMessage(); 
+                            Console.WriteLine($"[{DateTime.Now}]: Message received from {Username}: {receivedMessage}");
+
+                            Program.BroadcastMessage(Username, receivedMessage, UID.ToString());
                             break;
                         default:
                             break;
@@ -51,7 +52,7 @@ namespace ChatServer
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine($"[{UID.ToString()}]: Disconnected");
+                    Console.WriteLine($"[{DateTime.Now}]: Client '{Username}' has disconnected");
                     Program.BroadcastDisconnect(UID.ToString());
                     ClientSocket.Close();
                     break;
