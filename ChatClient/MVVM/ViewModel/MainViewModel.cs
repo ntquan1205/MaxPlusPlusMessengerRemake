@@ -21,8 +21,10 @@ namespace ChatClient.MVVM.ViewModel
         public RelayCommand ConnectToServerCommand { get; set; }
         public RelayCommand SendMessageCommand { get; set; }
         public string Username { get; set; }
-
         public string Message { get; set; }
+
+        public string ServerIP { get; set; } = "127.0.0.1"; 
+        public string ServerPort { get; set; } = "7891";
 
         private Server _server;
         public MainViewModel()
@@ -33,7 +35,7 @@ namespace ChatClient.MVVM.ViewModel
             _server.connectedEvent += UserConnected;
             _server.userDisconnectedEvent += RemoveUser;
             _server.msgReceivedEvent += MessageReceived;
-            ConnectToServerCommand = new RelayCommand(o => _server.ConnectToServer(Username), o => !string.IsNullOrEmpty(Username));
+            ConnectToServerCommand = new RelayCommand(o => _server.ConnectToServer(Username, ServerIP, ServerPort),o => !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(ServerIP) && !string.IsNullOrEmpty(ServerPort));
             SendMessageCommand = new RelayCommand(o => _server.SendMessageToServer(Message), o => !string.IsNullOrEmpty(Message));
         }
 

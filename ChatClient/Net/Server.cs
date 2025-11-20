@@ -20,20 +20,28 @@ namespace ChatClient.Net
             _client = new TcpClient();
         }
 
-        public void ConnectToServer(string username)
+        public void ConnectToServer(string username, string ip, string port)
         {
             if (!_client.Connected)
             {
-                _client.Connect("127.0.0.1", 7891);
-                PacketReader = new PacketReader(_client.GetStream());
-                if (!string.IsNullOrEmpty(username))
+                if (int.TryParse(port, out int portNumber))
                 {
-                    var connectPacket = new PacketBuilder();
-                    connectPacket.WriteOpCode(0);
-                    connectPacket.WriteMessage(username);
-                    _client.Client.Send(connectPacket.GetPacketBytes());
+                    _client.Connect(ip, portNumber);
+                    PacketReader = new PacketReader(_client.GetStream());
+
+                    if (!string.IsNullOrEmpty(username))
+                    {
+                        var connectPacket = new PacketBuilder();
+                        connectPacket.WriteOpCode(0);
+                        connectPacket.WriteMessage(username);
+                        _client.Client.Send(connectPacket.GetPacketBytes());
+                    }
+                    ReadPackets();
                 }
-                ReadPackets();
+                else
+                {
+                    throw new ArgumentException("Invalid port number");
+                }
             }
         }
 
